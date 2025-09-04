@@ -4,18 +4,7 @@
   <version>2.1</version>
   <vendor email="3563198204@qq.com">风吹半夏</vendor>
 
-  <description><![CDATA[
-ScreenMoveEditor is an innovative IntelliJ IDEA plugin that brings advanced code editing experience with screen capture functionality:<br>
-<ul>
-  <li>Press <b>F4</b> to quickly capture screen areas and generate movable, scalable, editable floating code editor panels in selected regions (customizable shortcut keys available in settings)</li>
-  <li>Floating editor panels sync in real-time with original files, supporting drag, resize, and close operations</li>
-  <li>Support <b>Ctrl + mouse wheel</b> for quick font size scaling of floating editor</li>
-  <li>Borders support multi-directional stretching, top dragging, and free scaling from bottom-right corner</li>
-  <li>Intelligent mouse event handling for smooth experience</li>
-  <li>QQ Group: 959550742</li>
-</ul>
-Perfect for multi-window comparison, temporary editing, code snippet focusing scenarios, greatly improving development efficiency.
-  ]]></description>
+  <description>%plugin.description%</description>
 
   <change-notes><![CDATA[
       <b>1.0 首发版本：</b><br>
@@ -43,7 +32,7 @@ Perfect for multi-window comparison, temporary editing, code snippet focusing sc
   </extensions>
 
   <actions>
-    <action id="ScreenCaptureAction" class="com.print.ScreenCaptureAction" text="ScreenMoveEditor" description="Capture screen area and create editable floating code panel">
+    <action id="ScreenCaptureAction" class="com.print.ScreenCaptureAction" text="%action.name%" description="%action.description%">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
       <keyboard-shortcut keymap="$default" first-keystroke="F4"/>
     </action>

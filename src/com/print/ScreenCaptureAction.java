@@ -8,6 +8,8 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.WindowManager;
+import com.intellij.openapi.util.NlsContexts;
+import com.intellij.openapi.util.NlsActions;
 
 import javax.swing.*;
 import java.awt.*;
@@ -190,7 +192,7 @@ public class ScreenCaptureAction extends AnAction {
 
         // 获取当前文件名
         VirtualFile file = FileDocumentManager.getInstance().getFile(document);
-        String fileName = file != null ? file.getName() : "未命名";
+        String fileName = file != null ? file.getName() : getMessage("unnamed.file");
 
         // 计算选区起点对应的逻辑行
         Point editorLocation = currentEditor.getContentComponent().getLocationOnScreen();
@@ -667,6 +669,23 @@ public class ScreenCaptureAction extends AnAction {
             }
         }
         floatingDialog.setVisible(anyWindowVisible);
+    }
+
+    /**
+     * 获取国际化消息
+     */
+    private String getMessage(String key) {
+        try {
+            return com.intellij.AbstractBundle.message(com.intellij.openapi.util.NlsBundle.class, key);
+        } catch (Exception e) {
+            // 如果国际化失败，返回默认值
+            switch (key) {
+                case "unnamed.file":
+                    return "未命名";
+                default:
+                    return key;
+            }
+        }
     }
 
 
