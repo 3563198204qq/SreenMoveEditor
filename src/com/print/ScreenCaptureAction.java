@@ -15,6 +15,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * @Author: xiongd
@@ -676,7 +678,10 @@ public class ScreenCaptureAction extends AnAction {
      */
     private String getMessage(String key) {
         try {
-            return com.intellij.AbstractBundle.message(com.intellij.openapi.util.NlsBundle.class, key);
+            // 使用ResourceBundle加载国际化资源
+            ResourceBundle bundle = ResourceBundle.getBundle("messages.plugin", 
+                Locale.getDefault(), this.getClass().getClassLoader());
+            return bundle.getString(key);
         } catch (Exception e) {
             // 如果国际化失败，返回默认值
             switch (key) {
