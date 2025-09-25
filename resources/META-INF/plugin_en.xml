@@ -1,0 +1,58 @@
+<idea-plugin>
+  <id>com.com.print.sreenmoveeditor</id>
+  <name>ScreenMoveEditor</name>
+  <version>2.2</version>
+  <vendor email="3563198204@qq.com">风吹半夏</vendor>
+
+  <description><![CDATA[
+ScreenMoveEditor is an innovative IntelliJ IDEA plugin that brings advanced code editing experience with screen capture functionality:<br>
+<ul>
+  <li>Press <b>F4</b> to quickly capture screen areas and generate movable, scalable, editable floating code editor panels in selected regions (customizable shortcut keys available in settings)</li>
+  <li>Floating editor panels sync in real-time with original files, supporting drag, resize, and close operations</li>
+  <li>Support <b>Ctrl + mouse wheel</b> for quick font size scaling of floating editor</li>
+  <li>Borders support multi-directional stretching, top dragging, and free scaling from bottom-right corner</li>
+  <li>Intelligent mouse event handling for smooth experience</li>
+  <li>QQ Group: 959550742</li>
+</ul>
+Perfect for multi-window comparison, temporary editing, code snippet focusing scenarios, greatly improving development efficiency.
+  ]]></description>
+
+  <change-notes><![CDATA[
+      <b>2.2 版本更新：</b><br>
+      <ul>
+        <li>🎨 <b>UI美化升级：</b>浮动编辑框采用现代化圆角设计，视觉效果更加美观</li>
+        <li>🔘 <b>关闭按钮优化：</b>重新设计关闭按钮样式，支持悬停效果和更好的交互反馈</li>
+        <li>📱 <b>布局优化：</b>改进标题栏和按钮间距，提升整体用户体验</li>
+      </ul>
+      <b>Version 1.0 - Initial Release:</b><br>
+      <ul>
+        <li>Support pressing <b>F4</b> to capture screen areas and generate movable, scalable, editable floating code editor panels (customizable shortcut keys available in settings)</li>
+        <li>Floating editor panels sync in real-time with original files, supporting multiple windows</li>
+        <li>Support <b>Ctrl + mouse wheel</b> for quick font size scaling of floating editor</li>
+        <li>Borders support multi-directional stretching, top dragging, and free scaling from bottom-right corner</li>
+        <li>Intelligent mouse event handling for smooth experience, optimized border cursor and close button experience</li>
+        <li>Fixed multiple issues with floating editor border dragging, scaling and other details</li>
+      </ul>
+      Welcome feedback and suggestions, continuously optimizing!
+    ]]>
+  </change-notes>
+
+  <!-- please see https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html for description -->
+  <idea-version since-build="173.0"/>
+
+  <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
+       on how to target different products -->
+  <depends>com.intellij.modules.platform</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+
+  <actions>
+    <action id="ScreenCaptureAction" class="com.print.ScreenCaptureAction" text="ScreenMoveEditor" description="Capture screen area and create editable floating code panel">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="F4"/>
+    </action>
+  </actions>
+
+</idea-plugin>

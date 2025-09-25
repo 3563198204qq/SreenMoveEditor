@@ -1,0 +1,58 @@
+<idea-plugin>
+  <id>com.com.print.sreenmoveeditor</id>
+  <name>屏幕移动编辑器</name>
+  <version>2.2</version>
+  <vendor email="3563198204@qq.com">风吹半夏</vendor>
+
+  <description><![CDATA[
+屏幕移动编辑器是一款创新的 IntelliJ IDEA 插件，集成了屏幕截取功能，带来先进的代码编辑体验：<br>
+<ul>
+  <li>按 <b>F4</b> 键可快速截取屏幕区域，并在所选区域生成可移动、可缩放、可编辑的悬浮代码编辑框。（可通过设置界面自定义快捷键）</li>
+  <li>悬浮编辑框与原文件实时同步，支持拖动、拉伸、关闭等操作。</li>
+  <li>支持 <b>Ctrl + 鼠标滚轮</b> 快速缩放悬浮编辑器字体大小。</li>
+  <li>边框支持多方向拉伸，顶部支持拖动，右下角可自由缩放。</li>
+  <li>智能处理鼠标事件，体验流畅。</li>
+  <li>QQ交流群: 959550742</li>
+</ul>
+适用于需要多窗口对比、临时编辑、代码片段聚焦等场景，极大提升开发效率。
+  ]]></description>
+
+  <change-notes><![CDATA[
+      <b>2.2 版本更新：</b><br>
+      <ul>
+        <li>🎨 <b>UI美化升级：</b>浮动编辑框采用现代化圆角设计，视觉效果更加美观</li>
+        <li>🔘 <b>关闭按钮优化：</b>重新设计关闭按钮样式，支持悬停效果和更好的交互反馈</li>
+        <li>📱 <b>布局优化：</b>改进标题栏和按钮间距，提升整体用户体验</li>
+      </ul>
+      <b>1.0 首发版本：</b><br>
+      <ul>
+        <li>支持按 <b>F4</b> 键截取屏幕区域，生成可移动、可缩放、可编辑的悬浮代码编辑框。（可通过设置界面自定义快捷键）</li>
+        <li>悬浮编辑框与原文件实时同步，支持多窗口并存。</li>
+        <li>支持通过 <b>Ctrl + 鼠标滚轮</b> 快速缩放悬浮编辑器字体大小。</li>
+        <li>边框支持多方向拉伸，顶部支持拖动，右下角可自由缩放。</li>
+        <li>智能处理鼠标事件，体验流畅，优化边界光标和关闭按钮体验。</li>
+        <li>修复了悬浮编辑器边框拖动、缩放等多项细节问题。</li>
+      </ul>
+      欢迎反馈建议，持续优化中！
+    ]]>
+  </change-notes>
+
+  <!-- please see https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html for description -->
+  <idea-version since-build="173.0"/>
+
+  <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
+       on how to target different products -->
+  <depends>com.intellij.modules.platform</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+
+  <actions>
+    <action id="ScreenCaptureAction" class="com.print.ScreenCaptureAction" text="屏幕移动编辑器" description="截取屏幕区域并创建可编辑的悬浮代码框">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="F4"/>
+    </action>
+  </actions>
+
+</idea-plugin>
