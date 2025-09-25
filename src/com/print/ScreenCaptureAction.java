@@ -204,24 +204,106 @@ public class ScreenCaptureAction extends AnAction {
         LogicalPosition logicalPos = currentEditor.visualToLogicalPosition(visualPos);
 
         Window owner = WindowManager.getInstance().getFrame(project);
-        JDialog floatingDialog = new JDialog(owner);
+        JDialog floatingDialog = new JDialog(owner) {
+            @Override
+            protected JRootPane createRootPane() {
+                JRootPane rootPane = new JRootPane() {
+                    @Override
+                    protected void paintBorder(Graphics g) {
+                        Graphics2D g2d = (Graphics2D) g.create();
+                        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                        
+                        // 绘制圆角边框
+                        g2d.setColor(new Color(100, 100, 100));
+                        g2d.setStroke(new BasicStroke(1.0f));
+                        g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+                        
+                        g2d.dispose();
+                    }
+                };
+                rootPane.setOpaque(false);
+                return rootPane;
+            }
+        };
         floatingDialog.setUndecorated(true);
         floatingDialog.setBounds(screenX, screenY, Math.max(width, 300), Math.max(height, 200));
         floatingDialog.setAlwaysOnTop(true);
         floatingDialog.setLayout(new BorderLayout());
 
-        JPanel titleBar = new JPanel();
-        titleBar.setBackground(new Color(70, 70, 70));
+        // 创建圆角标题栏
+        JPanel titleBar = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // 绘制圆角背景
+                g2d.setColor(new Color(70, 70, 70));
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                
+                // 绘制底部圆角遮罩，让标题栏看起来更圆滑
+                g2d.setColor(new Color(70, 70, 70));
+                g2d.fillRect(0, getHeight() - 4, getWidth(), 4);
+                
+                g2d.dispose();
+            }
+        };
         titleBar.setPreferredSize(new Dimension(0, 25));
         titleBar.setLayout(new BorderLayout());
         JLabel titleLabel = new JLabel(fileName);
         titleLabel.setForeground(Color.WHITE);
         titleBar.add(titleLabel, BorderLayout.WEST);
-        JButton closeButton = new JButton("×");
-        closeButton.setPreferredSize(new Dimension(25, 25));
+        // 创建自定义的圆滑关闭按钮
+        JButton closeButton = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                int width = getWidth();
+                int height = getHeight();
+                
+                // 绘制圆角背景
+                if (getModel().isPressed()) {
+                    // 按下状态 - 深红色
+                    g2d.setColor(new Color(200, 50, 50));
+                } else if (getModel().isRollover()) {
+                    // 悬停状态 - 红色
+                    g2d.setColor(new Color(220, 60, 60));
+                } else {
+                    // 正常状态 - 透明
+                    g2d.setColor(new Color(0, 0, 0, 0));
+                }
+                
+                // 绘制圆角矩形背景
+                g2d.fillRoundRect(2, 2, width - 4, height - 4, 8, 8);
+                
+                // 绘制关闭图标 "×"
+                g2d.setColor(Color.WHITE);
+                g2d.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                
+                int centerX = width / 2;
+                int centerY = height / 2;
+                int size = Math.min(width, height) / 3;
+                
+                // 绘制两条交叉的线
+                g2d.drawLine(centerX - size, centerY - size, centerX + size, centerY + size);
+                g2d.drawLine(centerX + size, centerY - size, centerX - size, centerY + size);
+                
+                g2d.dispose();
+            }
+            
+            @Override
+            public Dimension getPreferredSize() {
+                return new Dimension(20, 20);
+            }
+        };
+        
+        closeButton.setPreferredSize(new Dimension(20, 20));
         closeButton.setBorder(null);
-        closeButton.setBackground(new Color(70, 70, 70));
-        closeButton.setForeground(Color.WHITE);
+        closeButton.setContentAreaFilled(false);
+        closeButton.setFocusPainted(false);
+        closeButton.setOpaque(false);
 
         final Editor[] floatingEditor = new Editor[1];
         floatingEditor[0] = EditorFactory.getInstance().createEditor(document, project,file,false);
