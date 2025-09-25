@@ -209,9 +209,13 @@ public class ScreenCaptureAction extends AnAction {
             protected JRootPane createRootPane() {
                 JRootPane rootPane = new JRootPane() {
                     @Override
-                    protected void paintBorder(Graphics g) {
+                    protected void paintComponent(Graphics g) {
                         Graphics2D g2d = (Graphics2D) g.create();
                         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                        
+                        // 绘制圆角背景
+                        g2d.setColor(new Color(45, 45, 45));
+                        g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
                         
                         // 绘制圆角边框
                         g2d.setColor(new Color(100, 100, 100));
@@ -223,6 +227,14 @@ public class ScreenCaptureAction extends AnAction {
                 };
                 rootPane.setOpaque(false);
                 return rootPane;
+            }
+            
+            @Override
+            public void setBounds(int x, int y, int width, int height) {
+                super.setBounds(x, y, width, height);
+                // 设置圆角形状
+                setShape(new java.awt.geom.RoundRectangle2D.Double(0, 0, width, height, 8, 8));
+                repaint();
             }
         };
         floatingDialog.setUndecorated(true);
@@ -237,24 +249,29 @@ public class ScreenCaptureAction extends AnAction {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
-                // 绘制圆角背景
-                g2d.setColor(new Color(70, 70, 70));
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                // 绘制圆角背景，顶部圆角
+                g2d.setColor(new Color(60, 60, 60));
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight() + 4, 8, 8);
                 
-                // 绘制底部圆角遮罩，让标题栏看起来更圆滑
-                g2d.setColor(new Color(70, 70, 70));
-                g2d.fillRect(0, getHeight() - 4, getWidth(), 4);
+                // 绘制底部直线，确保与内容区域无缝连接
+                g2d.setColor(new Color(60, 60, 60));
+                g2d.fillRect(0, getHeight() - 2, getWidth(), 4);
                 
                 g2d.dispose();
             }
         };
         titleBar.setPreferredSize(new Dimension(0, 25));
         titleBar.setLayout(new BorderLayout());
+        
+        // 标题标签，添加左边距
         JLabel titleLabel = new JLabel(fileName);
         titleLabel.setForeground(Color.WHITE);
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
         titleBar.add(titleLabel, BorderLayout.WEST);
-        // 创建自定义的圆滑关闭按钮
+        // 创建现代化的关闭按钮
         JButton closeButton = new JButton() {
+            private boolean isHovered = false;
+            
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g.create();
@@ -263,28 +280,28 @@ public class ScreenCaptureAction extends AnAction {
                 int width = getWidth();
                 int height = getHeight();
                 
-                // 绘制圆角背景
+                // 绘制背景
                 if (getModel().isPressed()) {
-                    // 按下状态 - 深红色
-                    g2d.setColor(new Color(200, 50, 50));
-                } else if (getModel().isRollover()) {
-                    // 悬停状态 - 红色
-                    g2d.setColor(new Color(220, 60, 60));
+                    // 按下状态 - 深红色，圆形背景稍大
+                    g2d.setColor(new Color(180, 40, 40));
+                    g2d.fillOval(0, 0, width, height);
+                } else if (isHovered) {
+                    // 悬停状态 - 红色，圆形背景更大
+                    g2d.setColor(new Color(220, 50, 50));
+                    g2d.fillOval(-1, -1, width + 2, height + 2);
                 } else {
-                    // 正常状态 - 透明
-                    g2d.setColor(new Color(0, 0, 0, 0));
+                    // 正常状态 - 半透明灰色，正常尺寸
+                    g2d.setColor(new Color(80, 80, 80, 100));
+                    g2d.fillOval(2, 2, width - 4, height - 4);
                 }
-                
-                // 绘制圆角矩形背景
-                g2d.fillRoundRect(2, 2, width - 4, height - 4, 8, 8);
                 
                 // 绘制关闭图标 "×"
                 g2d.setColor(Color.WHITE);
-                g2d.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2d.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 
                 int centerX = width / 2;
                 int centerY = height / 2;
-                int size = Math.min(width, height) / 3;
+                int size = Math.min(width, height) / 4;
                 
                 // 绘制两条交叉的线
                 g2d.drawLine(centerX - size, centerY - size, centerX + size, centerY + size);
@@ -295,15 +312,38 @@ public class ScreenCaptureAction extends AnAction {
             
             @Override
             public Dimension getPreferredSize() {
-                return new Dimension(20, 20);
+                return new Dimension(18, 18); // 恢复原来的按钮尺寸
+            }
+            
+            // 添加鼠标监听器来检测悬停状态
+            {
+                addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        isHovered = true;
+                        repaint();
+                    }
+                    
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        isHovered = false;
+                        repaint();
+                    }
+                });
             }
         };
         
-        closeButton.setPreferredSize(new Dimension(20, 20));
+        closeButton.setPreferredSize(new Dimension(18, 18));
         closeButton.setBorder(null);
         closeButton.setContentAreaFilled(false);
         closeButton.setFocusPainted(false);
         closeButton.setOpaque(false);
+
+        // 创建关闭按钮容器，添加右边距和上边距
+        JPanel closeButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        closeButtonPanel.setOpaque(false);
+        closeButtonPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 8));
+        closeButtonPanel.add(closeButton);
 
         final Editor[] floatingEditor = new Editor[1];
         floatingEditor[0] = EditorFactory.getInstance().createEditor(document, project,file,false);
@@ -338,11 +378,28 @@ public class ScreenCaptureAction extends AnAction {
             floatingDialog.dispose();
         });
 
+        titleBar.add(closeButtonPanel, BorderLayout.EAST);
 
-        titleBar.add(closeButton, BorderLayout.EAST);
-
+        // 创建圆角内容面板
+        JPanel contentPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // 绘制圆角背景，底部圆角
+                g2d.setColor(getBackground());
+                g2d.fillRoundRect(0, -4, getWidth(), getHeight() + 4, 8, 8);
+                
+                g2d.dispose();
+            }
+        };
+        contentPanel.setLayout(new BorderLayout());
+        contentPanel.setOpaque(false);
+        contentPanel.add(floatingEditor[0].getComponent(), BorderLayout.CENTER);
+        
         floatingDialog.add(titleBar, BorderLayout.NORTH);
-        floatingDialog.add(floatingEditor[0].getComponent(), BorderLayout.CENTER);
+        floatingDialog.add(contentPanel, BorderLayout.CENTER);
 
         // 添加拖拽和缩放功能
         addDragAndResizeFunctionality(floatingDialog, titleBar, closeButton);
