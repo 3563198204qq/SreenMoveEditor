@@ -1,12 +1,20 @@
 <idea-plugin>
   <id>com.com.print.sreenmoveeditor</id>
   <name>SreenMoveEditor</name>
-  <version>2.2</version>
+  <version>2.3</version>
   <vendor email="3563198204@qq.com">风吹半夏</vendor>
 
   <description>ScreenMoveEditor is an innovative IntelliJ IDEA plugin that brings advanced code editing experience with screen capture functionality. Press F4 to quickly capture screen areas and generate movable, scalable, editable floating code editor panels in selected regions. Floating editor panels sync in real-time with original files, supporting drag, resize, and close operations. Support Ctrl + mouse wheel for quick font size scaling of floating editor. Borders support multi-directional stretching, top dragging, and free scaling from bottom-right corner. Intelligent mouse event handling for smooth experience. Perfect for multi-window comparison, temporary editing, code snippet focusing scenarios, greatly improving development efficiency.</description>
 
   <change-notes><![CDATA[
+      <b>2.3 版本更新：</b><br>
+      <ul>
+        <li>🪟 修复浮动窗层级问题：IDE 搜索/设置等对话框可正常置于其上并可输入</li>
+        <li>🖱️ 改进滚动条命中判定：拖动滑块更容易命中，避免误触边框拉伸</li>
+        <li>↔️ 光标策略优化：仅在标题栏/边框时显示移动/缩放光标，其他区域保持默认</li>
+        <li>🧹 稳定性：移除多余的全局监听，关闭窗口时安全释放资源</li>
+      </ul>
+      
       <b>2.2 版本更新：</b><br>
       <ul>
         <li>🎨 <b>UI美化升级：</b>浮动编辑框采用现代化圆角设计，视觉效果更加美观</li>

@@ -239,7 +239,12 @@ public class ScreenCaptureAction extends AnAction {
         };
         floatingDialog.setUndecorated(true);
         floatingDialog.setBounds(screenX, screenY, Math.max(width, 300), Math.max(height, 200));
-        floatingDialog.setAlwaysOnTop(true);
+        // 不要默认置顶，避免压住 IDEA 的对话框/搜索窗
+        floatingDialog.setAlwaysOnTop(false);
+        // 让窗口更像工具窗，不打断主窗口的输入焦点
+        try { floatingDialog.setType(Window.Type.UTILITY); } catch (Throwable ignore) { }
+        floatingDialog.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
+        floatingDialog.setAutoRequestFocus(false);
         floatingDialog.setLayout(new BorderLayout());
 
         // 创建圆角标题栏
@@ -348,33 +353,10 @@ public class ScreenCaptureAction extends AnAction {
         final Editor[] floatingEditor = new Editor[1];
         floatingEditor[0] = EditorFactory.getInstance().createEditor(document, project,file,false);
 
-        // 添加窗口焦点监听器
-        WindowFocusListener focusListener = new WindowFocusListener() {
-            @Override
-            public void windowGainedFocus(WindowEvent e) {
-                // 当前窗口获得焦点时保持可见
-                floatingDialog.setAlwaysOnTop(true);
-            }
-
-            @Override
-            public void windowLostFocus(WindowEvent e) {
-                // 当前窗口失去焦点时，检查是否是 IDEA 主窗口的子窗口获得焦点
-                Window oppositeWindow = e.getOppositeWindow();
-                if (oppositeWindow != null && isIdeaDialog(oppositeWindow)) {
-                    // 如果是 IDEA 对话框获得焦点，则将浮动编辑框置于其后
-                    floatingDialog.setAlwaysOnTop(false);
-                }
-            }
-        };
-
-        floatingDialog.addWindowFocusListener(focusListener);
-
-        // 监听 IDEA 主窗口的焦点变化
-        attachFocusListener(project, floatingDialog);
+        // 保持简单的层级策略：浮动框不置顶，由系统正常管理层级
 
         closeButton.addActionListener(e -> {
             EditorFactory.getInstance().releaseEditor(floatingEditor[0]);
-            floatingDialog.removeWindowFocusListener(focusListener);
             floatingDialog.dispose();
         });
 
@@ -496,6 +478,11 @@ public class ScreenCaptureAction extends AnAction {
                     return false;
                 }
 
+                // 如果当前位置在任意滚动条上，则不拦截（交给滚动条处理）
+                if (isOnAnyScrollBarAccurate(frame.getContentPane(), frame.getGlassPane(), new Point(x, y))) {
+                    return false;
+                }
+
 //                // 上边框区域只支持拖拽，不支持缩放
                 if (y < TITLE_HEIGHT) {
                     return x >= BORDER_THICKNESS && x < w - BORDER_THICKNESS;
@@ -574,6 +561,8 @@ public class ScreenCaptureAction extends AnAction {
 
             @Override
             public void mouseMoved(MouseEvent e) {
+                // 默认先恢复普通光标，再根据区域调整
+                frame.setCursor(Cursor.getDefaultCursor());
                 // 中键按下时不改变光标
                 if ((e.getModifiersEx() & InputEvent.BUTTON2_DOWN_MASK) != 0) {
                     frame.setCursor(Cursor.getDefaultCursor());
@@ -591,9 +580,8 @@ public class ScreenCaptureAction extends AnAction {
                     return;
                 }
 
-                // 判断是否在滚动条上
-                Point mouseOnContent = SwingUtilities.convertPoint(frame.getGlassPane(), e.getPoint(), frame.getContentPane());
-                if (isOnAnyScrollBar(frame.getContentPane(), mouseOnContent)) {
+                // 判断是否在滚动条上（更精准的坐标换算）
+                if (isOnAnyScrollBarAccurate(frame.getContentPane(), frame.getGlassPane(), e.getPoint())) {
                     frame.setCursor(Cursor.getDefaultCursor());
                     return;
                 }
@@ -619,6 +607,11 @@ public class ScreenCaptureAction extends AnAction {
                 else if (left) frame.setCursor(cursors[3]);        // W
                 else if (right) frame.setCursor(cursors[4]);       // E
                 else frame.setCursor(Cursor.getDefaultCursor());
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                frame.setCursor(Cursor.getDefaultCursor());
             }
 
             @Override
@@ -719,6 +712,13 @@ public class ScreenCaptureAction extends AnAction {
             }
         }
         return false;
+    }
+
+    // 更精准：从 glassPane 坐标开始，自动换算到目标组件坐标进行命中测试
+    private boolean isOnAnyScrollBarAccurate(Component contentRoot, Component glassPane, Point pointOnGlass) {
+        if (contentRoot == null || glassPane == null || pointOnGlass == null) return false;
+        Point pOnContent = SwingUtilities.convertPoint(glassPane, pointOnGlass, contentRoot);
+        return isOnAnyScrollBar(contentRoot, pOnContent);
     }
 
     private boolean isOnScrollBarThumb(Component comp, Point mouse) {
